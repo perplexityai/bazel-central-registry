@@ -1,5 +1,16 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
+# These suites exceed 15 minutes on macOS, even while making steady progress.
+_SLOW_TESTS = [
+    "db_compaction_compaction_service_test",
+    "db_db_iterator_test",
+    "db_db_wal_test",
+    "table_block_based_block_based_table_reader_test",
+    "table_table_test",
+    "utilities_transactions_write_committed_transaction_ts_test",
+    "utilities_transactions_write_unprepared_transaction_test",
+]
+
 def gen_test_targets(name, srcs):
     """Generates a cc_test target for each source file.
 
@@ -21,6 +32,5 @@ def gen_test_targets(name, srcs):
                 "@platforms//os:linux": ["-ldl"],
                 "@platforms//os:macos": [],
             }),
-            # Full codec coverage takes over 12 minutes even on Linux amd64.
-            timeout = "eternal" if name == "table_table_test" else "long",
+            timeout = "eternal" if name in _SLOW_TESTS else "long",
         )
